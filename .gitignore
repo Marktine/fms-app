@@ -1,0 +1,11 @@
+# Logs
+logs/
+
+# Environment variables
+app/.env
+
+# Designs and documentation
+docs/designs/
+
+# Antigravity CLI
+.antigravitycli/
