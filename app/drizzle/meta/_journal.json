@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1778677549535,
+      "tag": "0000_panoramic_killmonger",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780415497906,
+      "tag": "0001_unique_korg",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781620190301,
+      "tag": "0002_complete_fabian_cortez",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "tasks": {
+    "dev": "deno run --env --allow-net --allow-env --allow-read --allow-write --allow-ffi --allow-sys=hostname --watch src/main.ts",
+    "start": "deno run --env --allow-net=0.0.0.0:3000,localhost:5432,db:5432 --allow-env --allow-sys=hostname --allow-read=. --allow-ffi src/main.ts",
+    "db:generate": "deno run --env --allow-read --allow-write --allow-env npm:drizzle-kit generate",
+    "db:migrate": "deno run --env --allow-net --allow-read --allow-write --allow-env npm:drizzle-kit migrate",
+    "db:seed": "deno run --env --allow-net --allow-env --allow-read --allow-ffi src/core/seeds.ts",
+    "db:seed:perf": "deno run --env --allow-net --allow-env --allow-read --allow-ffi src/core/perf_seeder.ts",
+    "db:perf:benchmark": "deno run --env --allow-net --allow-env --allow-read --allow-ffi src/core/perf_benchmark.ts"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx"
+  },
+  "imports": {
+    "@felix/argon2": "jsr:@felix/argon2@^3.0.5",
+    "@hono/hono": "npm:hono@^4.12.23",
+    "@loglayer/hono": "npm:@loglayer/hono@^2.1.0",
+    "@loglayer/transport-pino": "npm:@loglayer/transport-pino@^3.0.3",
+    "bcryptjs": "npm:bcryptjs@^3.0.3",
+    "hono": "npm:hono@^4.12.23",
+    "hono/deno": "npm:hono@^4.12.23/deno",
+    "hono/cookie": "npm:hono@^4.12.23/cookie",
+    "hono/jwt": "npm:hono@^4.12.23/jwt",
+    "hono/http-exception": "npm:hono@^4.12.23/http-exception",
+    "hono/utils/http-status": "npm:hono@^4.12.23/utils/http-status",
+    "hono/jsx": "npm:hono@^4.12.23/jsx",
+    "hono/jsx/jsx-runtime": "npm:hono@^4.12.23/jsx/jsx-runtime",
+    "hono/jsx/jsx-dev-runtime": "npm:hono@^4.12.23/jsx/jsx-dev-runtime",
+    "drizzle-orm": "npm:drizzle-orm@^0.45.2",
+    "loglayer": "npm:loglayer@^9.1.1",
+    "lucide": "npm:lucide@^1.17.0",
+    "pino": "npm:pino@^10.3.1",
+    "pino-roll": "npm:pino-roll@^4.0.0",
+    "postgres": "npm:postgres@^3.4.9",
+    "drizzle-kit": "npm:drizzle-kit@^0.31.10",
+    "@hono/zod-validator": "npm:@hono/zod-validator@^0.8.0",
+    "pino-pretty": "npm:pino-pretty@^13.0.0"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}
