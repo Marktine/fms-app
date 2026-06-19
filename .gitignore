@@ -9,3 +9,5 @@ docs/designs/
 
 # Antigravity CLI
 .antigravitycli/
+
+.env
