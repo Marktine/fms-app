@@ -1,5 +1,5 @@
 /** @jsxImportSource hono/jsx */
-import { Child } from "hono/jsx";
+import { Child } from 'hono/jsx';
 
 type SelectOption = { value: string; label: string } | string;
 
@@ -13,7 +13,7 @@ type SelectProps = {
 export const Select = ({
   options,
   children,
-  class: className = "",
+  class: className = '',
   ...props
 }: SelectProps) => {
   return (
@@ -23,11 +23,11 @@ export const Select = ({
     >
       {options
         ? options.map((opt, index) => {
-            if (typeof opt === "string") {
-              return <option key={index} value={opt}>{opt}</option>;
-            }
-            return <option key={index} value={opt.value}>{opt.label}</option>;
-          })
+          if (typeof opt === 'string') {
+            return <option key={index} value={opt}>{opt}</option>;
+          }
+          return <option key={index} value={opt.value}>{opt.label}</option>;
+        })
         : children}
     </select>
   );

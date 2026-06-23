@@ -5,7 +5,7 @@ import { formatCurrency } from '../../../ui/utils/format.ts';
 import { Icon } from '../../../ui/components/Icon.tsx';
 import { Button } from '../../../ui/components/Button.tsx';
 import { Card } from '../../../ui/components/Card.tsx';
-import { Transaction } from '../dashboard.service.ts';
+import { Transaction, TransactionFilters } from '../dashboard.service.ts';
 import { Coffee, DollarSign, Filter, type IconNode, Repeat, ShoppingBasket, Train } from 'lucide';
 import { DashboardFiltersSkeleton } from './DashboardFilters.view.tsx';
 
@@ -20,18 +20,20 @@ const lucideIconMap: Record<string, IconNode> = {
 export type DashboardPageProps = {
   balance: bigint;
   transactions: Transaction[];
+  filters?: TransactionFilters;
 };
 
 export const DashboardPage = ({
   balance,
   transactions,
+  filters,
 }: DashboardPageProps) => (
   <AuthenticatedLayout title='Dashboard'>
     {/* Ledger Column / Receipt */}
     <Card class='w-full max-w-[720px] pb-xl'>
       {/* Sticky Filter Bar */}
       <div class='sticky top-[64px] z-30 bg-surface-container-lowest/95 backdrop-blur-sm border-b-[3px] border-on-surface p-md flex items-center gap-sm shadow-[0_4px_0px_rgba(27,28,26,0.05)]'>
-        <DashboardFiltersSkeleton />
+        <DashboardFiltersSkeleton filters={filters} />
         <Button variant='outline' class='w-10 h-10 px-0 py-0'>
           <Icon icon={Filter} class='w-5 h-5' />
         </Button>

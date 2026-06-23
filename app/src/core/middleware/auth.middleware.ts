@@ -1,5 +1,5 @@
 import { MiddlewareHandler } from 'hono';
-import { getCookie, deleteCookie } from 'hono/cookie';
+import { deleteCookie, getCookie } from 'hono/cookie';
 import { verify } from 'hono/jwt';
 import { HTTPException } from 'hono/http-exception';
 import { log } from '../logger.ts';
@@ -20,7 +20,7 @@ export interface AuthEnv {
 /**
  * Middleware that enforces authentication.
  * Verifies JWT token from 'token' cookie.
- * 
+ *
  * Supports both traditional HTML/JSON responses and HTMX requests:
  * - Redirects to /auth/login for page requests.
  * - Handles HTMX redirects using the HX-Redirect header.
@@ -40,8 +40,8 @@ export const requireAuth: MiddlewareHandler<AuthEnv> = async (c, next) => {
   }
 
   try {
-    const payload = await verify(token, jwtSecret, "HS256");
-    
+    const payload = await verify(token, jwtSecret, 'HS256');
+
     if (!payload || !payload.userId || !payload.email) {
       handleUnauthorized();
     }
@@ -100,7 +100,7 @@ export const redirectIfAuth: MiddlewareHandler = async (c, next) => {
 /**
  * Scaffolding role-based authorization check (RBAC).
  * Enforces that an authenticated user has one of the allowed roles.
- * 
+ *
  * Note: Since our schema does not have a role column on the users table yet,
  * this acts as a placeholder that can be extended once roles are added.
  */
@@ -115,9 +115,9 @@ export function requireRole(allowedRoles: string[]): MiddlewareHandler<AuthEnv> 
     // e.g., const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
     // If the JWT payload contains roles:
     // const roles: string[] = c.get('roles') || [];
-    
+
     // For scaffolding demonstration, we assume a default role of 'USER'.
-    const userRole = 'USER'; 
+    const userRole = 'USER';
 
     if (!allowedRoles.includes(userRole)) {
       throw new HTTPException(403, { message: 'Insufficient permissions' });
@@ -130,10 +130,10 @@ export function requireRole(allowedRoles: string[]): MiddlewareHandler<AuthEnv> 
 /**
  * Scaffolding resource ownership check (ABAC).
  * Ensures that the authenticated user owns/is authorized for the specific resource.
- * 
+ *
  * Example usage:
  * router.get('/transactions/:id', requireOwnership(
- *   'id', 
+ *   'id',
  *   async (userId, transactionId) => {
  *     const transaction = await db.select().from(transactions).where(eq(transactions.id, transactionId));
  *     return transaction && transaction.userId === userId;
@@ -142,7 +142,7 @@ export function requireRole(allowedRoles: string[]): MiddlewareHandler<AuthEnv> 
  */
 export function requireOwnership(
   paramName: string,
-  checkOwnershipFn: (userId: string, resourceId: string) => boolean | Promise<boolean>
+  checkOwnershipFn: (userId: string, resourceId: string) => boolean | Promise<boolean>,
 ): MiddlewareHandler<AuthEnv> {
   return async (c, next) => {
     const userId = c.get('userId');

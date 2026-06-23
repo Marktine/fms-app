@@ -32,7 +32,9 @@ const FULL_MONTH_NAMES = [
  * Formats a date string or Date object into UI representations (uiDate and uiMonth).
  * Uses UTC to prevent off-by-one errors with YYYY-MM-DD date strings.
  */
-export function formatTransactionDate(dateInput: string | Date): { uiDate: string; uiMonth: string } {
+export function formatTransactionDate(
+  dateInput: string | Date,
+): { uiDate: string; uiMonth: string } {
   const d = new Date(dateInput);
   const monthIndex = d.getUTCMonth();
   const uiDate = `${MONTH_NAMES[monthIndex]} ${d.getUTCDate()}`;
