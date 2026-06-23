@@ -1,5 +1,5 @@
 /** @jsxImportSource hono/jsx */
-import { renderIcon, type IconNode } from '../../core/utils/icons.ts';
+import { type IconNode, renderIcon } from '../../core/utils/icons.ts';
 import { raw } from 'hono/html';
 
 type IconProps = {
@@ -9,12 +9,12 @@ type IconProps = {
   fill?: boolean;
 };
 
-export const Icon = ({ name, icon, class: className = "", fill = false }: IconProps) => {
+export const Icon = ({ name, icon, class: className = '', fill = false }: IconProps) => {
   if (icon) {
     return raw(renderIcon(icon, className));
   }
   return (
-    <span class={`material-symbols-outlined ${fill ? "icon-fill" : ""} ${className}`}>
+    <span class={`material-symbols-outlined ${fill ? 'icon-fill' : ''} ${className}`}>
       {name}
     </span>
   );

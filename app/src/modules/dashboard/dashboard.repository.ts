@@ -1,7 +1,13 @@
-import { eq, desc, and, or, gt, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, ne, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '../../core/db.ts';
-import { transactions, categories, accounts, accountBalanceSnapshots, AccountType } from '../../core/schema.ts';
+import {
+  accountBalanceSnapshots,
+  accounts,
+  AccountType,
+  categories,
+  transactions,
+} from '../../core/schema.ts';
 
 export type DashboardTransactionRow = {
   id: string;
@@ -29,10 +35,73 @@ export class DashboardRepository {
   async getRecentTransactionsByUserId(
     userId: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
+    filters?: {
+      month?: string;
+      category?: string;
+      type?: string;
+    },
   ): Promise<DashboardTransactionRow[]> {
     const sourceAccount = alias(accounts, 'sourceAccount');
     const destAccount = alias(accounts, 'destAccount');
+
+    const conditions = [eq(transactions.userId, userId)];
+
+    if (filters) {
+      if (filters.month) {
+        const [monthName, yearStr] = filters.month.split(' ');
+        const MONTH_MAP: Record<string, number> = {
+          JANUARY: 1,
+          FEBRUARY: 2,
+          MARCH: 3,
+          APRIL: 4,
+          MAY: 5,
+          JUNE: 6,
+          JULY: 7,
+          AUGUST: 8,
+          SEPTEMBER: 9,
+          OCTOBER: 10,
+          NOVEMBER: 11,
+          DECEMBER: 12,
+        };
+        const monthNum = MONTH_MAP[monthName.toUpperCase()];
+        if (monthNum && /^\d+$/.test(yearStr)) {
+          const yearNum = parseInt(yearStr, 10);
+          conditions.push(
+            eq(sql`EXTRACT(MONTH FROM ${transactions.date})`, monthNum),
+            eq(sql`EXTRACT(YEAR FROM ${transactions.date})`, yearNum),
+          );
+        }
+      }
+
+      if (filters.category) {
+        conditions.push(eq(categories.name, filters.category));
+      }
+
+      if (filters.type) {
+        if (filters.type === 'Debits') {
+          conditions.push(
+            or(
+              eq(destAccount.type, 'EXPENSE'),
+              and(
+                eq(sourceAccount.type, 'ASSET'),
+                ne(destAccount.type, 'ASSET'),
+              )!,
+            )!,
+          );
+        } else if (filters.type === 'Credits') {
+          conditions.push(
+            and(
+              ne(destAccount.type, 'EXPENSE'),
+              or(
+                ne(sourceAccount.type, 'ASSET'),
+                eq(destAccount.type, 'ASSET'),
+              )!,
+            )!,
+          );
+        }
+      }
+    }
 
     const result = await db
       .select({
@@ -49,7 +118,7 @@ export class DashboardRepository {
       .innerJoin(categories, eq(transactions.categoryId, categories.id))
       .innerJoin(sourceAccount, eq(transactions.sourceAccountId, sourceAccount.id))
       .innerJoin(destAccount, eq(transactions.destinationAccountId, destAccount.id))
-      .where(eq(transactions.userId, userId))
+      .where(and(...conditions))
       .orderBy(desc(transactions.date), desc(transactions.createdAt))
       .limit(limit)
       .offset(offset);
@@ -58,7 +127,7 @@ export class DashboardRepository {
   }
 
   async getLatestBalancesByUserId(
-    userId: string
+    userId: string,
   ): Promise<AccountBalanceSnapshotRow[]> {
     return await db
       .selectDistinctOn([accountBalanceSnapshots.accountId], {
@@ -77,13 +146,13 @@ export class DashboardRepository {
 
   async getTransactionDeltaSinceSnapshot(
     accountId: string,
-    snapshotDate?: string
+    snapshotDate?: string,
   ): Promise<bigint> {
     const conditions = [
       or(
         eq(transactions.sourceAccountId, accountId),
-        eq(transactions.destinationAccountId, accountId)
-      )
+        eq(transactions.destinationAccountId, accountId),
+      ),
     ];
 
     if (snapshotDate) {
@@ -97,7 +166,7 @@ export class DashboardRepository {
             WHEN ${transactions.destinationAccountId} = ${accountId} THEN ${transactions.amount} 
             ELSE -${transactions.amount} 
           END
-        ), 0)`
+        ), 0)`,
       })
       .from(transactions)
       .where(and(...conditions));
@@ -146,5 +215,3 @@ export class DashboardRepository {
     return ['Debits', 'Credits'];
   }
 }
-
-

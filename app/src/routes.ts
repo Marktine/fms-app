@@ -10,7 +10,7 @@ export const router = new Hono();
 
 /*
  * Auth modules
- * */
+ */
 const authRepo = new AuthRepository();
 const authService = new AuthService(authRepo);
 const authModule = new AuthRouter(authService);
@@ -19,7 +19,7 @@ router.route('/auth', authModule.router);
 
 /*
  * Dashboard modules
- * */
+ */
 const dashboardRepo = new DashboardRepository();
 const dashboardService = new DashboardService(dashboardRepo);
 const dashboardModule = new DashboardRouter(dashboardService);

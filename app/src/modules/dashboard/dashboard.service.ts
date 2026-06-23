@@ -22,6 +22,12 @@ export interface DashboardFilterData {
   type: string[];
 }
 
+export interface TransactionFilters {
+  month?: string;
+  category?: string;
+  type?: string;
+}
+
 export class DashboardService {
   constructor(private readonly repo: DashboardRepository) {}
 
@@ -40,8 +46,11 @@ export class DashboardService {
     };
   }
 
-  public async getDashboardData(userId: string): Promise<DashboardData> {
-    const rawTransactions = await this.repo.getRecentTransactionsByUserId(userId);
+  public async getDashboardData(
+    userId: string,
+    filters?: TransactionFilters,
+  ): Promise<DashboardData> {
+    const rawTransactions = await this.repo.getRecentTransactionsByUserId(userId, 50, 0, filters);
 
     const transactions: Transaction[] = rawTransactions.map((row) => {
       let amount = row.amount;

@@ -1,7 +1,12 @@
 import { Hono } from 'hono';
 import { sign } from 'hono/jwt';
 import { setCookie } from 'hono/cookie';
-import { requireAuth, requireRole, redirectIfAuth, AuthEnv } from '../src/core/middleware/auth.middleware.ts';
+import {
+  AuthEnv,
+  redirectIfAuth,
+  requireAuth,
+  requireRole,
+} from '../src/core/middleware/auth.middleware.ts';
 import { globalErrorRegistry } from '../src/core/interceptors/error.interceptor.tsx';
 import { assertEquals } from 'jsr:@std/assert@^1.0.8';
 
@@ -11,7 +16,7 @@ Deno.env.set('JWT_SECRET', 'test-env-jwt-secret-key-12345');
 Deno.test('requireAuth - should authenticate successfully with valid JWT in cookie', async () => {
   const app = new Hono();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.get('/dashboard', requireAuth, (c) => {
     return c.json({
       success: true,
@@ -45,7 +50,7 @@ Deno.test('requireAuth - should authenticate successfully with valid JWT in cook
 Deno.test('requireAuth - should redirect standard page request to /auth/login when no token cookie', async () => {
   const app = new Hono();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.get('/dashboard', requireAuth, (c) => {
     return c.text('Protected Area');
   });
@@ -59,7 +64,7 @@ Deno.test('requireAuth - should redirect standard page request to /auth/login wh
 Deno.test('requireAuth - should return 401 JSON when API route requested without token', async () => {
   const app = new Hono();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.get('/api/data', requireAuth, (c) => {
     return c.json({ sensitive: 'data' });
   });
@@ -75,7 +80,7 @@ Deno.test('requireAuth - should return 401 JSON when API route requested without
 Deno.test('requireAuth - should return 401 with HX-Redirect header when HTMX page requests without token', async () => {
   const app = new Hono();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.get('/dashboard', requireAuth, (c) => {
     return c.text('Protected Page');
   });
@@ -93,7 +98,7 @@ Deno.test('requireAuth - should return 401 with HX-Redirect header when HTMX pag
 Deno.test('requireAuth - should handle invalid JWT token and redirect/reject', async () => {
   const app = new Hono();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.get('/dashboard', requireAuth, (c) => {
     return c.text('Protected Area');
   });
@@ -111,7 +116,7 @@ Deno.test('requireAuth - should handle invalid JWT token and redirect/reject', a
 Deno.test('requireRole - should allow access when user role matches', async () => {
   const app = new Hono<AuthEnv>();
   app.onError(globalErrorRegistry.handle);
-  
+
   // Set mock authenticated user variables
   app.use('*', async (c, next) => {
     c.set('userId', 'user-123');
@@ -132,7 +137,7 @@ Deno.test('requireRole - should allow access when user role matches', async () =
 Deno.test('requireRole - should return 403 Forbidden when user role does not match', async () => {
   const app = new Hono<AuthEnv>();
   app.onError(globalErrorRegistry.handle);
-  
+
   app.use('*', async (c, next) => {
     c.set('userId', 'user-123');
     c.set('userEmail', 'user@example.com');
@@ -194,7 +199,7 @@ Deno.test('redirectIfAuth - should clear invalid cookie and let user access logi
 
   assertEquals(res.status, 200);
   assertEquals(await res.text(), 'Login Page');
-  
+
   // Verify that the set-cookie header is present to delete the token
   const setCookieHeader = res.headers.get('set-cookie');
   assertEquals(setCookieHeader?.includes('token=;'), true);

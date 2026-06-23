@@ -1,5 +1,5 @@
-import { AuthRepository } from "./auth.repository.ts";
-import { verify, hash } from '@felix/argon2';
+import { AuthRepository } from './auth.repository.ts';
+import { hash, verify } from '@felix/argon2';
 import { sign } from 'hono/jwt';
 
 export class AuthService {
@@ -33,7 +33,7 @@ export class AuthService {
   }> {
     const passwordHash = await hash(password);
     const user = await this.repo.findByEmail(email);
-    let errorMessage = "Failed to create new user!";
+    let errorMessage = 'Failed to create new user!';
     if (!user) {
       const newUser = await this.repo.createUser({
         email,
@@ -42,10 +42,10 @@ export class AuthService {
       if (newUser) {
         return {
           result: true,
-        }
+        };
       }
     } else {
-      errorMessage = "User already exists";
+      errorMessage = 'User already exists';
     }
     return {
       errorMessage,

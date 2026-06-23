@@ -1,6 +1,6 @@
 import { db } from './db.ts';
-import { users, accounts, categories, transactions, accountBalanceSnapshots } from './schema.ts';
-import { eq, and } from 'drizzle-orm';
+import { accountBalanceSnapshots, accounts, categories, transactions, users } from './schema.ts';
+import { and, eq } from 'drizzle-orm';
 import { hash } from '@felix/argon2';
 
 async function seed() {
@@ -9,8 +9,9 @@ async function seed() {
   try {
     // 1. Find or create the user
     let userId: string;
-    const existingUser = await db.select().from(users).where(eq(users.email, 'test@example.com')).limit(1);
-    
+    const existingUser = await db.select().from(users).where(eq(users.email, 'test@example.com'))
+      .limit(1);
+
     if (existingUser.length > 0) {
       userId = existingUser[0].id;
       console.log(`Using existing user test@example.com with ID: ${userId}`);
@@ -41,7 +42,7 @@ async function seed() {
       const existing = await db.select().from(categories)
         .where(and(eq(categories.userId, userId), eq(categories.name, cat.name)))
         .limit(1);
-      
+
       if (existing.length > 0) {
         categoryMap[cat.name] = existing[0].id;
       } else {
@@ -75,7 +76,7 @@ async function seed() {
       const existing = await db.select().from(accounts)
         .where(and(eq(accounts.userId, userId), eq(accounts.name, acc.name)))
         .limit(1);
-      
+
       if (existing.length > 0) {
         accountMap[acc.name] = existing[0].id;
       } else {
@@ -309,12 +310,16 @@ async function seed() {
       const categoryId = categoryMap[tx.categoryName];
 
       if (!sourceAccountId || !destinationAccountId || !categoryId) {
-        console.error(`Skipping transaction ${tx.note} due to missing account/category references.`);
+        console.error(
+          `Skipping transaction ${tx.note} due to missing account/category references.`,
+        );
         continue;
       }
 
       const existing = await db.select().from(transactions)
-        .where(and(eq(transactions.userId, userId), eq(transactions.idempotencyKey, tx.idempotencyKey)))
+        .where(
+          and(eq(transactions.userId, userId), eq(transactions.idempotencyKey, tx.idempotencyKey)),
+        )
         .limit(1);
 
       if (existing.length > 0) {
@@ -342,7 +347,7 @@ async function seed() {
       const existingSnapshot = await db.select().from(accountBalanceSnapshots)
         .where(and(
           eq(accountBalanceSnapshots.accountId, checkingAccountId),
-          eq(accountBalanceSnapshots.snapshotDate, '2023-10-01')
+          eq(accountBalanceSnapshots.snapshotDate, '2023-10-01'),
         ))
         .limit(1);
 
@@ -368,4 +373,3 @@ async function seed() {
 }
 
 seed();
-

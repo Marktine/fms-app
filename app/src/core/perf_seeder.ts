@@ -1,6 +1,6 @@
 import { db } from './db.ts';
-import { users, accounts, categories, transactions, accountBalanceSnapshots } from './schema.ts';
-import { eq, and, like } from 'drizzle-orm';
+import { accountBalanceSnapshots, accounts, categories, transactions, users } from './schema.ts';
+import { and, eq, like } from 'drizzle-orm';
 import { hash } from '@felix/argon2';
 
 async function seed() {
@@ -96,7 +96,7 @@ async function seed() {
     const existingSnapshot = await db.select().from(accountBalanceSnapshots)
       .where(and(
         eq(accountBalanceSnapshots.accountId, checkingAccountId),
-        eq(accountBalanceSnapshots.snapshotDate, snapshotDate)
+        eq(accountBalanceSnapshots.snapshotDate, snapshotDate),
       ))
       .limit(1);
 
@@ -119,15 +119,15 @@ async function seed() {
 
     // Get existing perf transactions
     const existingTxs = await db.select({
-      idempotencyKey: transactions.idempotencyKey
+      idempotencyKey: transactions.idempotencyKey,
     })
-    .from(transactions)
-    .where(and(
-      eq(transactions.userId, userId),
-      like(transactions.idempotencyKey, 'perf-tx-%')
-    ));
+      .from(transactions)
+      .where(and(
+        eq(transactions.userId, userId),
+        like(transactions.idempotencyKey, 'perf-tx-%'),
+      ));
 
-    const existingKeys = new Set(existingTxs.map(t => t.idempotencyKey));
+    const existingKeys = new Set(existingTxs.map((t) => t.idempotencyKey));
     console.log(`Found ${existingKeys.size} existing performance transactions.`);
 
     const txsToInsert: Array<{
